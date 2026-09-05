@@ -85,16 +85,15 @@ Final deployed model — MobileNetV2 (fine-tuned), evaluated on the held-out tes
 | Macro Recall | 92.36% |
 | Macro F1-score | 92.41% |
 | Weighted F1-score | 92.57% |
-
 ## 🚀 Development Steps
 
-📊 **Dataset Preparation & EDA** — Cleaned, explored, and prepared the waste image dataset.
-🧠 **Model Development** — Built a baseline CNN and compared it with MobileNetV2 transfer learning.
-🎯 **Model Fine-Tuning** — Fine-tuned MobileNetV2 and evaluated its performance.
-⚙️ **Backend Development** — Built a FastAPI inference API and integrated S3 and DynamoDB.
-🐳 **Cloud Deployment** — Dockerized the backend and deployed it on AWS EC2.
-🌐 **Frontend Development** — Built the web interface and deployed it using Vercel.
-☁️ **Cloud Integration** — Connected cloud storage, database, and AI inference into the application.
+1. 📊 **Dataset Preparation & EDA** — Cleaned, explored, and prepared the waste image dataset.
+2. 🧠 **Model Development** — Built a baseline CNN and compared it with MobileNetV2 transfer learning.
+3. 🎯 **Model Fine-Tuning** — Fine-tuned MobileNetV2 and evaluated its performance.
+4. ⚙️ **Backend Development** — Built a FastAPI inference API and integrated S3 and DynamoDB.
+5. 🐳 **Cloud Deployment** — Dockerized the backend and deployed it on AWS EC2.
+6. 🌐 **Frontend Development** — Built the web interface and deployed it using Vercel.
+7. ☁️ **Cloud Integration** — Connected cloud storage, database, and AI inference into the application.
 
 ## 🌍 Vision
 
