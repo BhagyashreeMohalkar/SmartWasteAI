@@ -10,7 +10,7 @@
 // Constants & Configuration
 // =============================================================================
 
-const DEFAULT_API_BASE_URL = "http://3.110.45.239";
+const DEFAULT_API_BASE_URL = "/api";
 const STORAGE_KEY_ENDPOINT = "smartwaste_api_endpoint";
 const STORAGE_KEY_HISTORY = "smartwaste_prediction_history";
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
