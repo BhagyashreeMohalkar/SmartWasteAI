@@ -3,6 +3,7 @@ import io
 
 import tensorflow as tf
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
 from backend.inference import predict_image, MODEL_PATH
@@ -29,6 +30,19 @@ app = FastAPI(
     description="Cloud-based smart waste classification API",
     version="1.0.0",
     lifespan=lifespan
+)
+
+origins = [
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
 )
 
 
