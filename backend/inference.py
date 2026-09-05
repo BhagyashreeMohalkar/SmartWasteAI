@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 
 
-MODEL_PATH = Path("/app/model/smartwaste_mobilenetv2.keras")
+MODEL_PATH = Path("/app/model/smartwaste_mobilenetv2_v2.keras")
 CLASS_NAMES_PATH = Path("/app/model/class_names.json")
 
 IMG_SIZE = (224, 224)
@@ -20,8 +20,8 @@ def preprocess_image(image: Image.Image):
     image = image.convert("RGB")
     image = image.resize(IMG_SIZE)
 
+    # Preprocessing is already included inside the exported model.
     image_array = np.array(image, dtype=np.float32)
-    image_array = (image_array / 127.5) - 1.0
     image_array = np.expand_dims(image_array, axis=0)
 
     return image_array
