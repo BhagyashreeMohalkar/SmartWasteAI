@@ -459,21 +459,95 @@ function formatBytes(bytes) {
 // =============================================================================
 // API Classification Request (POST /predict)
 // =============================================================================
+async function optimizeImageForUpload(file) {
+  const MAX_DIMENSION = 1600;
+  const JPEG_QUALITY = 0.75;
+
+  // Already small enough — send the original file.
+  if (file.size <= 800 * 1024) {
+    return file;
+  }
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      try {
+        let width = img.naturalWidth;
+        let height = img.naturalHeight;
+
+        // Resize while preserving aspect ratio.
+        if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+          const scale = Math.min(
+            MAX_DIMENSION / width,
+            MAX_DIMENSION / height
+          );
+
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            URL.revokeObjectURL(objectUrl);
+
+            if (!blob) {
+              reject(new Error("Could not optimize image."));
+              return;
+            }
+
+            const optimizedFile = new File(
+              [blob],
+              file.name.replace(/\.[^.]+$/, ".jpg"),
+              {
+                type: "image/jpeg",
+                lastModified: Date.now()
+              }
+            );
+
+            resolve(optimizedFile);
+          },
+          "image/jpeg",
+          JPEG_QUALITY
+        );
+      } catch (error) {
+        URL.revokeObjectURL(objectUrl);
+        reject(error);
+      }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Could not read the selected image."));
+    };
+
+    img.src = objectUrl;
+  });
+}
 
 async function classifyImage(file) {
   if (!file) return;
 
-  // Set Loading State
   setLoadingState(true);
   hideError();
 
   try {
-    // Construct FormData with field name "file"
+    // Compress/resize the image before sending it to the cloud API.
+    const optimizedFile = await optimizeImageForUpload(file);
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", optimizedFile, file.name);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s timeout for deep learning inference
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
 
     const response = await fetch(`${currentApiBaseUrl}/predict`, {
       method: "POST",
@@ -485,29 +559,34 @@ async function classifyImage(file) {
 
     if (!response.ok) {
       let errorDetail = `Classification failed (HTTP ${response.status})`;
+
       try {
         const errJson = await response.json();
         if (errJson && errJson.detail) {
           errorDetail = errJson.detail;
         }
       } catch (_) {
-        // use status text if JSON parse fails
+        // Keep default error message.
       }
+
       throw new Error(errorDetail);
     }
 
     const result = await response.json();
-    // Expected response format: { prediction: "plastic", confidence: 0.9967, filename: "..." }
+
     handlePredictionSuccess(result, file.name);
 
   } catch (err) {
     console.error("Classification error:", err);
+
     let message = "Network error while calling AI service.";
+
     if (err.name === "AbortError") {
       message = "Request timed out. The cloud model server took too long to respond.";
     } else if (err.message) {
       message = err.message;
     }
+
     showError(`${message} Please check that the API endpoint is online.`);
   } finally {
     setLoadingState(false);
