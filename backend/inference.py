@@ -36,7 +36,7 @@ def predict_image(image: Image.Image, model):
     confidence = float(predictions[0][predicted_index])
 
     class_names = load_class_names()
-    predicted_class = class_names[str(predicted_index)]
+    predicted_class = class_names[predicted_index]
 
     return {
         "class": predicted_class,
